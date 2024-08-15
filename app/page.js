@@ -1,5 +1,5 @@
 'use client';
-
+import Flashcards from './flashcards/page.js';
 import getStripe from "@/utils/getStripe";
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
 import Head from "next/head";
@@ -151,7 +151,7 @@ export default function Home() {
                 <Typography sx={{ color: "text.secondary", mb: 3 }}>
                   Basic flashcards with limited access to features.
                 </Typography>
-                <Button variant="contained" color="primary" fullWidth>
+                <Button variant="contained" color="primary" fullWidth onClick={Flashcards}>
                   Choose Free
                 </Button>
               </Box>

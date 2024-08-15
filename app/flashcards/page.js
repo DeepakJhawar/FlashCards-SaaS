@@ -1,14 +1,14 @@
 "use client";
+import React, {useEffect, useState} from 'react';
 
-import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useAuth, useUser } from '@clerk/nextjs'
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { Card, CardActionArea, CardContent, Container, Grid, Typography } from "@mui/material";
 
 export default function Flashcards() {
-  const { user, isLoaded, isSignedIn } = useUser();  
+  const { isLoaded, isSignedIn, user } = useUser();  
   const [flashcards, setFlashcards] = useState([]);
   const router = useRouter();
 
