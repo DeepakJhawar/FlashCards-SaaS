@@ -14,7 +14,7 @@ const systemPrompt = `
 
 Remember the goal of flashcards is to facilitate effective learning and retention of information through these flashcards.
 
-Return in the following JSON format 
+Return in the following JSON format without any additional information:
 {
     "flashcards" :[
         {
@@ -29,21 +29,21 @@ export async function POST(req) {
     const openai = new OpenAI({
         baseURL: "https://openrouter.ai/api/v1",
         apiKey: process.env.OPENAI_API_KEY,
+        dangerouslyAllowBrowser: true
     });
     
     try {
         const data = await req.text();
-
         const completion = await openai.chat.completions.create({
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: data }
             ],
-            model: "gpt-3.5-turbo",
+            model: "meta-llama/llama-3.1-8b-instruct:free",
             response_format: {type: 'json_object'}
-        });
-        console.log(completion);
-        const flashcards = JSON.parse(completion.choices[0].message.content);
+        })
+        console.log(completion.choices[0].message.content.substring( completion.choices[0].message.content.indexOf('Here is' + 1)));
+        const flashcards = JSON.parse(completion.choices[0].message.content.substring( completion.choices[0].message.content.indexOf('{"flashcards" ' + 1)));
         return NextResponse.json(flashcards.flashcards);
     } catch (error) {
         console.error("Error generating flashcards:", error);

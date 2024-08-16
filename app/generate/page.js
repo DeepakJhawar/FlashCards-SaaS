@@ -1,6 +1,5 @@
 'use client'
-
-import { useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import {
   Box,
   Button,
@@ -19,12 +18,12 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { collection, doc, getDoc, writeBatch } from "firebase/firestore";
+import { collection, doc, getDoc, writeBatch, setDoc, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation"; // Ensure you use this import
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 
-export default function Generate() {
+const Generate = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const [flashcards, setFlashCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
@@ -33,14 +32,22 @@ export default function Generate() {
   const [open, setOpen] = useState(false);
   
   const router = useRouter(); // Ensure router is initialized
+  
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       console.log("User is not signed in");
     } else if (isLoaded && isSignedIn) {
       console.log("User is signed in with UID:", user.id);
+      const userDocRef = doc(db, "users", user.id);
+      const docSnap = getDoc(userDocRef);
+      
     }
   }, [isLoaded, isSignedIn, user]);
+
+  if (!isLoaded || !isSignedIn) {
+    return null
+  }
 
   const handleSubmit = async () => {
     try {
@@ -51,6 +58,15 @@ export default function Generate() {
       console.error("Error generating flashcards:", error);
     }
   };
+
+  const handleLogin = async () => {
+    const userDocRef = doc(db, "users", user.id);
+    const docSnap = await getDoc(userDocRef);
+    if (!docSnap.exists())
+    {
+      setDoc(userDocRef, { access: true }, { merge: true });
+    }
+  }
 
   const handleCardClick = (id) => {
     setFlipped((prev) => ({
@@ -93,7 +109,7 @@ export default function Generate() {
   
       collections.push({ name });
   
-      batch.set(userDocRef, { flashcards: collections }, { merge: true });
+      batch.set(userDocRef, { flashcards: collections, access: false }, { merge: true });
   
       const colRef = collection(userDocRef, name);
       flashcards.forEach((flashcard) => {
@@ -138,7 +154,20 @@ export default function Generate() {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleSubmit}
+            onClick={async () => {
+              handleLogin();
+              const userDocRef = doc(db, "users", user.id);
+              const docSnap = await getDoc(userDocRef);
+
+              if (docSnap.exists() && docSnap.data().access === false) {
+                alert("You used up your free trial. Please pay to continue using the service.");
+              }
+              else
+              {
+                handleSubmit();
+              }
+            }
+          }
             fullWidth
           >
             Submit
@@ -267,3 +296,5 @@ export default function Generate() {
     </Container>
   );
 }
+
+export default Generate;

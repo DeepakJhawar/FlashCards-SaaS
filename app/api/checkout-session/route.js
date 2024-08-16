@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { getAuth } from '@clerk/nextjs/server'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const formatAmountForStripe = (amount) => {
@@ -7,6 +8,10 @@ const formatAmountForStripe = (amount) => {
 };
 
 export async function GET(req, params){
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
   const searchParams = req.nextUrl.searchParams;
   const session_id = searchParams.get('session_id');
   try{

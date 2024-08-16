@@ -1,8 +1,9 @@
 'use client';
-import Flashcards from './flashcards/page.js';
 import getStripe from "@/utils/getStripe";
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
+import Flashcards from "./generate/page.js";
 import Head from "next/head";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import axios from "axios";
 
@@ -55,7 +56,7 @@ export default function Home() {
           <Button
             variant="contained"
             color="primary"
-            size="large"
+            size="large" component={Link} href="/generate"
             sx={{ px: 4, py: 1.5, fontSize: "1.25rem" }}
           >
             Get Started
@@ -151,7 +152,7 @@ export default function Home() {
                 <Typography sx={{ color: "text.secondary", mb: 3 }}>
                   Basic flashcards with limited access to features.
                 </Typography>
-                <Button variant="contained" color="primary" fullWidth onClick={Flashcards}>
+                <Button variant="contained" color="primary" fullWidth component={Link} href="/generate"> 
                   Choose Free
                 </Button>
               </Box>
@@ -180,7 +181,7 @@ export default function Home() {
                 <Typography sx={{ color: "text.secondary", mb: 3 }}>
                   Create and store up to 100 flashcards with standard features.
                 </Typography>
-                <Button variant="contained" color="primary" fullWidth>
+                <Button variant="contained" color="primary" fullWidth onClick= {handleSubmit}>
                   Choose Basic
                 </Button>
               </Box>
