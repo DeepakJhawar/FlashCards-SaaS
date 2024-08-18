@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
@@ -56,7 +55,7 @@ const resultPage = () => {
     <Container maxWidth="100vw" sx={{ textAlign: "center", mt: 4 }}>
       {session.payment_status === 'paid' ? (
         <>
-            <Typography variant="h4">Thank You for Purchasing.</Typography>
+            <Typography variant="h4">Thank You for Purchasing!</Typography>
             <Box sx={{mt: 22}}>
                 <Typography variant="h6">Session ID: {session_id} </Typography>
                 <Typography variant="body1">We have received your payment. You will receive the email with the details shortly.</Typography>

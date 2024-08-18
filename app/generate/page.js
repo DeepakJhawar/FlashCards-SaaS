@@ -1,6 +1,5 @@
 'use client'
-
-import { useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import {
   Box,
   Button,
@@ -15,42 +14,63 @@ import {
   DialogTitle,
   Grid,
   Paper,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { collection, doc, getDoc, writeBatch } from "firebase/firestore";
+import { collection, doc, getDoc, writeBatch, setDoc, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation"; // Ensure you use this import
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 
-export default function Generate() {
+
+const Generate = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const [flashcards, setFlashCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
-  const [text, setText] = useState("");
+  const [subject, setSubject] = useState("");
+  const [number, setNumber] = useState(0);
+  const[topics, setTopics] = useState("");
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
   
   const router = useRouter(); // Ensure router is initialized
+  
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       console.log("User is not signed in");
     } else if (isLoaded && isSignedIn) {
       console.log("User is signed in with UID:", user.id);
+      const userDocRef = doc(db, "users", user.id);
+      const docSnap = getDoc(userDocRef);
+      
     }
   }, [isLoaded, isSignedIn, user]);
 
+  if (!isLoaded || !isSignedIn) {
+    return null
+  }
+
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("/api/generate", { text });
+      const response = await axios.post("/api/generate", {subject, number, topics});
       const data = response.data;
       setFlashCards(data);
     } catch (error) {
       console.error("Error generating flashcards:", error);
     }
   };
+
+  const handleLogin = async () => {
+    const userDocRef = doc(db, "users", user.id);
+    const docSnap = await getDoc(userDocRef);
+    if (!docSnap.exists())
+    {
+      setDoc(userDocRef, { access: true }, { merge: true });
+    }
+  }
 
   const handleCardClick = (id) => {
     setFlipped((prev) => ({
@@ -93,7 +113,7 @@ export default function Generate() {
   
       collections.push({ name });
   
-      batch.set(userDocRef, { flashcards: collections }, { merge: true });
+      batch.set(userDocRef, { flashcards: collections, access: false }, { merge: true });
   
       const colRef = collection(userDocRef, name);
       flashcards.forEach((flashcard) => {
@@ -110,6 +130,133 @@ export default function Generate() {
       console.error("Error saving flashcards:", error);
     }
   };
+
+  const numbers = [
+    {
+      value: 1,
+      label: "1",
+    },
+    {
+      value: 2,
+      label: "2",
+    },
+    {
+      value: 3,
+      label: "3",
+    },
+    {
+      value: 4,
+      label: "4",
+    },
+    {
+      value: 5,
+      label: "5",
+    },
+    {
+      value: 6,
+      label: "6",
+    },
+    {
+      value: 7,
+      label: "7",
+    },
+    {
+      value: 8,
+      label: "8",
+    },
+    {
+      value: 9,
+      label: "9",
+    },
+    {
+      value: 10,
+      label: "10",
+    },
+    {
+      value: 11,
+      label: "11",
+    },
+    {
+      value: 12,
+      label: "12",
+    },
+    {
+      value: 13,
+      label: "13",
+    },
+    {
+      value: 14,
+      label: "14",
+    },
+    {
+      value: 15,
+      label: "15",
+    },
+    {
+      value: 16,
+      label: "16",
+    },
+    {
+      value: 17,
+      label: "17",
+    },
+    {
+      value: 18,
+      label: "18",
+    },
+    {
+      value: 19,
+      label: "19",
+    },
+    {
+      value: 20,
+      label: "20",
+    },
+    {
+      value: 21,
+      label: "21",
+    },
+    {
+      value: 22,
+      label: "22",
+    },
+    {
+      value: 23,
+      label: "23",
+    },
+    {
+      value: 24,
+      label: "24",
+    },
+    {
+      value: 25,
+      label: "25",
+    },
+    {
+      value: 26,
+      label: "26",
+    },
+    {
+      value: 27,
+      label: "27",
+    },
+    {
+      value: 28,
+      label: "28",
+    },
+    {
+      value: 29,
+      label: "29",
+    },
+    {
+      value: 30,
+      label: "30",
+    },
+    {
+      value: 31,
+      label: "31",
+    },
+  ];
   
 
   return (
@@ -125,20 +272,54 @@ export default function Generate() {
       >
         <Typography variant={"h4"}>Generate Flashcards</Typography>
         <Paper sx={{ p: 4, width: "100%" }}>
+        <Typography variant={"h5"}>Subject Name</Typography>
+       
           <TextField
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            label="Enter a text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)} 
+            label="E.g Math, Science, History"
             fullWidth
             multiline
-            rows={4}
-            variant="outlined"
+            variant="filled"
             sx={{ mb: 2 }}
           />
+           <Typography variant={"h5"}>Number of Flashcards</Typography> 
+           <TextField
+            id="outlined-numbers"
+            select
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+            label="E.g: 1,2,3"
+            defaultValue = "1"
+            helperText="Please select your currency">
+            {numbers.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+         
+        </TextField>
+        <Typography variant = {"h5"}>Topics to cover</Typography>
+        <Typography variant = {"h6"}>Put it in commas</Typography>
+        <TextField value = {topics} onChange = {(e) => setTopics(e.target.value)} label = "E.g Differentials, DNA, Roman Empire" fullWidth multiline variant = "filled" sx = {{mb: 2}}/>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleSubmit}
+            onClick={async () => {
+              handleLogin();
+              const userDocRef = doc(db, "users", user.id);
+              const docSnap = await getDoc(userDocRef);
+
+              if (docSnap.exists() && docSnap.data().access === false) {
+                alert("You used up your free trial. Please pay to continue using the service.");
+              }
+              else
+              {
+                setDoc(userDocRef, { access: false}, { merge: true })
+                handleSubmit();
+              }
+            }
+          }
             fullWidth
           >
             Submit
@@ -267,3 +448,5 @@ export default function Generate() {
     </Container>
   );
 }
+
+export default Generate;
