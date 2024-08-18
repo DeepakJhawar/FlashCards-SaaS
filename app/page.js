@@ -1,5 +1,5 @@
 'use client';
-import getStripe from "@/utils/getStripe";
+import getStripe from '@/utils/getStripe';
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
 import Flashcards from "./generate/page.js";
 import Head from "next/head";
@@ -10,10 +10,20 @@ import axios from "axios";
 export default function Home() {
   const handleSubmit = async () => {
     try {
-      const checkoutSession = await await fetch('/api/checkout_session', {
+     
+
+      const checkoutSession = await fetch('/api/checkout-session', {
         method: 'POST',
-        headers: { origin: 'http://localhost:3000' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
       })
+
+      if(!checkoutSession.ok)
+      {
+        console.error(`Error: ${response.statusText}`);
+        return;
+      }
 
       const checkoutSessionJson = await checkoutSession.json()
 
