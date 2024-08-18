@@ -15,7 +15,7 @@ If you have any feedback, please reach out to one of the authors.
 - [Deepak Jhawar](https://github.com/DeepakJhawar)
 
 ## Demo
-[![Demo](https://github.com/user-attachments/assets/26789bdc-d999-4b8a-8007-c8482458b43e)
+![Demo](https://github.com/user-attachments/assets/26789bdc-d999-4b8a-8007-c8482458b43e)
 ## Installation
 First, run the development server:
 
