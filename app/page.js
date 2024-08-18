@@ -10,7 +10,12 @@ import axios from "axios";
 export default function Home() {
   const handleSubmit = async () => {
     try {
-      const checkoutSession = await axios.post("/api/checkout-session");
+      const checkoutSession = await await fetch('/api/checkout_session', {
+        method: 'POST',
+        headers: { origin: 'http://localhost:3000' },
+      })
+
+      const checkoutSessionJson = await checkoutSession.json()
 
       if (checkoutSession.data.statusCode === 500) {
         console.error(checkoutSession.data.message);
@@ -60,6 +65,14 @@ export default function Home() {
             sx={{ px: 4, py: 1.5, fontSize: "1.25rem" }}
           >
             Get Started
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large" component={Link} href="/flashcards"
+            sx={{px: 4, py: 1.5, fontSize: "1.25rem" }}
+          >
+            View your Flashcards
           </Button>
         </Box>
 
